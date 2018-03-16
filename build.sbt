@@ -22,7 +22,9 @@ lazy val core =
 lazy val xgboost =
   project
     .in(file("modules/xgboost"))
+    .dependsOn(core)
     .settings(common)
+    .settings(libraryDependencies += "com.github.hirofumi" %% "xgboost4j" % "0.7.0-p3")
 
 lazy val common =
   Seq(
