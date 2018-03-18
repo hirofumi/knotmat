@@ -1,6 +1,0 @@
-package knotmat
-
-object FeatureSet {
-
-
-}

@@ -2,7 +2,7 @@ package knotmat
 
 import scala.collection.mutable
 
-sealed abstract class DataCodec[
+abstract class FeatureCodec[
 @specialized(Double, Float, Int, Long) A1,
 @specialized(Double, Float, Int, Long) A2
 ] { self =>
@@ -12,15 +12,15 @@ sealed abstract class DataCodec[
   def encode(a1: A1): A2
   def decode(a2: A2): A1
 
-  final def +[A3](that: DataCodec[A2, A3]): DataCodec[A1, A3] =
-    new DataCodec {
+  final def +[A3](that: FeatureCodec[A2, A3]): FeatureCodec[A1, A3] =
+    new FeatureCodec {
       final def dim: Int = that.dim
       final def encode(a1: A1): A3 = that.encode(self.encode(a1))
       final def decode(a3: A3): A1 = self.decode(that.decode(a3))
     }
 
-  final def sparse: DataCodec[Array[A1], Array[A2]] =
-    new DataCodec {
+  final def sparse: FeatureCodec[Array[A1], Array[A2]] =
+    new FeatureCodec {
       final def dim: Int = self.dim
       final def encode(a1: Array[A1]): Array[A2] = a1.map(self.encode)
       final def decode(a2: Array[A2]): Array[A1] = a2.map(self.decode)
@@ -28,12 +28,12 @@ sealed abstract class DataCodec[
 
 }
 
-object DataCodec {
+object FeatureCodec {
 
-  implicit final class DataCodecArraySyntax[A1, A2](private val self: DataCodec[Array[A1], Array[A2]]) extends AnyVal {
+  implicit final class VectorCodecArraySyntax[A1, A2](private val self: FeatureCodec[Array[A1], Array[A2]]) extends AnyVal {
 
-    def weighted[@specialized(Double, Float, Int, Long) B]: DataCodec[ArrayPair[A1, B], ArrayPair[A2, B]] =
-      new DataCodec {
+    def weighted[@specialized(Double, Float, Int, Long) B]: FeatureCodec[ArrayPair[A1, B], ArrayPair[A2, B]] =
+      new FeatureCodec {
         final def dim: Int =
           self.dim
         final def encode(pair: ArrayPair[A1, B]): ArrayPair[A2, B] =
@@ -44,7 +44,7 @@ object DataCodec {
 
   }
 
-  final class Index[A <: AnyRef] private () extends DataCodec[A, Int] {
+  final class Index[A <: AnyRef] private () extends FeatureCodec[A, Int] {
 
     private[this] val fromInt: mutable.ArrayBuffer[A] =
       mutable.ArrayBuffer.empty
@@ -69,19 +69,19 @@ object DataCodec {
 
   }
 
-  def bow: DataCodec[ArrayPair[String, Int], ArrayPair[Int, Int]] =
+  def bow: FeatureCodec[ArrayPair[String, Int], ArrayPair[Int, Int]] =
     bow(index)
 
-  def bow(index: Index[String]): DataCodec[ArrayPair[String, Int], ArrayPair[Int, Int]] =
+  def bow(index: Index[String]): FeatureCodec[ArrayPair[String, Int], ArrayPair[Int, Int]] =
     weightedWords[Int](index)
 
   def index[A <: AnyRef]: Index[A] =
     new Index[A]
 
-  def weightedWords[@specialized(Double, Float, Int, Long) A]: DataCodec[ArrayPair[String, A], ArrayPair[Int, A]] =
+  def weightedWords[@specialized(Double, Float, Int, Long) A]: FeatureCodec[ArrayPair[String, A], ArrayPair[Int, A]] =
     weightedWords(index)
 
-  def weightedWords[@specialized(Double, Float, Int, Long) A](index: Index[String]): DataCodec[ArrayPair[String, A], ArrayPair[Int, A]] =
+  def weightedWords[@specialized(Double, Float, Int, Long) A](index: Index[String]): FeatureCodec[ArrayPair[String, A], ArrayPair[Int, A]] =
     index.sparse.weighted[A]
 
 }

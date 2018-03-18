@@ -1,13 +1,13 @@
 package knotmat.xgboost
 
-import knotmat.LabeledSetCodec
+import knotmat.ModelFactory
 import ml.dmlc.xgboost4j.java.DMatrix
 
-object DMatrixCodec {
+object DMatrixFactory {
 
-  def denseLabeled: LabeledSetCodec.Simple[DMatrix, Array[Float], Float] =
-    LabeledSetCodec[Array[Float], Float]
-      .map({ labeled =>
+  def denseLabeled: ModelFactory.ForLabeledSet[Array[Float], Float, DMatrix] =
+    ModelFactory[DMatrix]
+      .composeLabeledSet[Array[Float], Float]({ labeled =>
         val features = Array.newBuilder[Float]
         val labels   = Array.newBuilder[Float]
         val (nrows, ncols) =
