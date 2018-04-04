@@ -1,24 +1,33 @@
 package knotmat.xgboost
 
-import knotmat.ModelFactory
+import knotmat.{DataSet, ModelFactory}
 import ml.dmlc.xgboost4j.java.DMatrix
+import scala.collection.mutable
 
 object DMatrixFactory {
 
-  def denseLabeled: ModelFactory.ForLabeledSet[Array[Float], Float, DMatrix] =
-    ModelFactory[DMatrix]
-      .composeLabeledSet[Array[Float], Float]({ labeled =>
-        val features = Array.newBuilder[Float]
+  object Dense {
+
+    def singleLabel: ModelFactory.Dense.SingleLabel[Float, DMatrix] =
+      ModelFactory[DMatrix].compose[DataSet.Dense.SingleLabel[Float]]({ dataSet =>
+        val features = mutable.Buffer.empty[Array[Float]]
         val labels   = Array.newBuilder[Float]
         val (nrows, ncols) =
-          labeled.foreach({
-            case (feature, label) =>
-              features ++= feature
-              labels    += label
+          dataSet.foreach({ point =>
+            features += point.feature.values
+            labels   += point.label.value
           })
-        val dm = new DMatrix(features.result(), nrows, ncols)
+        val data = new Array[Float](features.foldLeft(0)(_ + _.length))
+        var i = 0
+        for (f <- features) {
+          System.arraycopy(f, 0, data, i, f.length)
+          i += f.length
+        }
+        val dm = new DMatrix(data, nrows, ncols)
         dm.setLabel(labels.result())
         dm
       })
+
+  }
 
 }
