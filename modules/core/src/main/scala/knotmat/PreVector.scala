@@ -2,6 +2,9 @@ package knotmat
 
 sealed abstract class PreVector[@specialized(Double, Float, Int, Long) +A] {
 
+  def ++[A2 >: A](that: PreVector.Sparse[A2]): PreVector.Sparse[A2] =
+    ???
+
   def foreach(f: PreVector.Callback[A]): Unit
 
 }
