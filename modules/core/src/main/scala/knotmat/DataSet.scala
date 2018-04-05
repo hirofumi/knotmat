@@ -16,18 +16,20 @@ object DataSet {
 
     object NoLabel {
 
-      def fromIterable[A](dim: => Int): Iterable[Point.Dense.NoLabel[A]] => NoLabel[A] =
+      /*
+      def fromIterable[A, B](dim: => Int)(implicit E: PointEncoder.Dense.NoLabel[A, B]): Iterable[A] => NoLabel[B] =
         points =>
-          new NoLabel[A] {
-            def foreach[U](f: Point.Dense.NoLabel[A] => U): (Int, Int) = {
+          new NoLabel[B] {
+            def foreach[U](f: Point.Dense.NoLabel[B] => U): (Int, Int) = {
               var i = 0
               for (point <- points) {
-                f(point)
+                f(E.encode(point))
                 i += 1
               }
               (i, dim)
             }
           }
+          */
 
     }
 

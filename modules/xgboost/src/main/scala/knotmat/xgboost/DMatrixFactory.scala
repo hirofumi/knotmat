@@ -14,7 +14,7 @@ object DMatrixFactory {
         val labels   = Array.newBuilder[Float]
         val (nrows, ncols) =
           dataSet.foreach({ point =>
-            features += point.feature.values
+            features += point.feature.chunks
             labels   += point.label.value
           })
         val data = new Array[Float](features.foldLeft(0)(_ + _.length))
