@@ -1,5 +1,5 @@
 package object knotmat {
 
-  type ArrayPair[A, B] = (Array[A], Array[B])
+  type Sparse[A, B] = (Array[A], Array[B])
 
 }

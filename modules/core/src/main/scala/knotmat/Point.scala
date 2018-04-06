@@ -2,44 +2,44 @@ package knotmat
 
 sealed trait Point[@specialized(Double, Float, Int, Long) A] {
 
-  def feature: PreVector[A]
+  def feature: Vec[A]
 
-  def label: PreVector[A]
+  def label: Vec[A]
 
 }
 
 object Point {
 
   sealed trait MultiLabel[@specialized(Double, Float, Int, Long) A] extends Point[A] {
-    def label: PreVector.Dense[A]
+    def label: Vec.Dense[A]
   }
 
-  sealed trait NoLabel[@specialized(Double, Float, Int, Long) A] extends Point[A] {
-    final def label: PreVector[A] = PreVector.Empty
+  sealed abstract class NoLabel[@specialized(Double, Float, Int, Long) A: Vec.Empty] extends Point[A] {
+    final def label: Vec[A] = Vec.Empty[A]
   }
 
   sealed trait SingleLabel[@specialized(Double, Float, Int, Long) A] extends Point[A] {
-    def label: PreVector.Single[A]
+    def label: Vec.Single[A]
   }
 
   trait Dense[@specialized(Double, Float, Int, Long) A] extends Point[A] {
-    def feature: PreVector.Dense[A]
+    def feature: Vec.Dense[A]
   }
 
   object Dense {
 
     final case class MultiLabel[@specialized(Double, Float, Int, Long) A](
-      feature: PreVector.Dense[A],
-      label: PreVector.Dense[A]
+      feature: Vec.Dense[A],
+      label: Vec.Dense[A]
     ) extends Dense[A] with Point.MultiLabel[A]
 
     final case class NoLabel[@specialized(Double, Float, Int, Long) A](
-      feature: PreVector.Dense[A]
+      feature: Vec.Dense[A]
     ) extends Dense[A] with Point.NoLabel[A]
 
     final case class SingleLabel[@specialized(Double, Float, Int, Long) A](
-      feature: PreVector.Dense[A],
-      label: PreVector.Single[A]
+      feature: Vec.Dense[A],
+      label: Vec.Single[A]
     ) extends Dense[A] with Point.SingleLabel[A]
 
   }
