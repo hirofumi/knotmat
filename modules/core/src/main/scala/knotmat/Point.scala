@@ -1,11 +1,8 @@
 package knotmat
 
 sealed trait Point[@specialized(Double, Float, Int, Long) A] {
-
   def feature: Vec[A]
-
   def label: Vec[A]
-
 }
 
 object Point {
